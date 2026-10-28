@@ -14,9 +14,18 @@ Tudo está em `index.html`:
 
 ## Pendente
 
-- [ ] Enviar leads para Google Sheets / CRM (hoje ficam só no navegador — ver comentário `// Lead:` no script)
-- [ ] Versões separadas para tráfego (`/trafego`) e base de clientes (`/clientes`)
+- [ ] Colar a URL do App da Web em `SHEETS_URL` (index.html)
+
 - [ ] Pixel da Meta (PageView + Lead)
+
+## Integração com a planilha
+
+O script está em `apps-script/Code.gs`. Ele grava cada giro na aba **Leads**, bloqueia WhatsApp repetido e cria a coluna **Status do resgate** para o time acompanhar.
+
+## Links por origem
+
+- Tráfego pago: `?origem=trafego`
+- Disparo para clientes: `?origem=clientes`
 
 ## Deploy
 

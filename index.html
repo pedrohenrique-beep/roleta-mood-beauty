@@ -258,33 +258,61 @@ function pick(){
   return 0;
 }
 
+// Integração com a planilha (Google Apps Script). Cole aqui a URL do App da Web.
+const SHEETS_URL = '';
+
+// Origem do lead: ?origem=trafego / ?origem=clientes (ou utm_source)
+const qs = new URLSearchParams(location.search);
+const ORIGEM = (qs.get('origem') || qs.get('utm_source') || 'direto').toLowerCase().slice(0,40);
+
+async function registrarLead(lead){
+  if(!SHEETS_URL) return {ok:true, offline:true};
+  try{
+    const r = await fetch(SHEETS_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(lead)});
+    return await r.json();
+  }catch(e){
+    // Falha de rede: não trava o giro; o lead fica salvo no aparelho como reserva.
+    return {ok:true, offline:true};
+  }
+}
+
 let rotation = 0, spinning = false;
-$('form').addEventListener('submit', e=>{
+$('form').addEventListener('submit', async e=>{
   e.preventDefault();
   if(spinning) return;
   const nome = $('nome').value.trim(), phone = whats.value.replace(/\D/g,'');
-  const err = $('err');
+  const err = $('err'), btn = $('spinBtn');
   if(nome.length < 2){ err.textContent = 'Digite seu nome para liberar o giro.'; $('nome').focus(); return; }
   if(phone.length < 10){ err.textContent = 'Digite um WhatsApp válido com DDD.'; whats.focus(); return; }
   if(!$('aceite').checked){ err.textContent = 'Marque o aceite do regulamento para girar.'; return; }
   if(used(phone)){ err.textContent = 'Este WhatsApp já girou a roleta. Cada número tem direito a um giro.'; return; }
   err.textContent = '';
 
+  spinning = true; btn.disabled = true; btn.textContent = 'Liberando seu giro…';
   const i = pick();
+  const code = 'MOOD-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  const lead = {nome, whatsapp: '55' + phone, premio: PRIZES[i].full, codigo: code, origem: ORIGEM};
+  const res = await registrarLead(lead);
+  btn.textContent = 'Girar a roleta';
+
+  if(!res.ok){
+    spinning = false; btn.disabled = false;
+    err.textContent = res.erro === 'ja_girou'
+      ? 'Este WhatsApp já girou a roleta. Cada número tem direito a um giro.'
+      : 'Não conseguimos liberar seu giro. Confira os dados e tente de novo.';
+    if(res.erro === 'ja_girou') markUsed(phone);
+    return;
+  }
+  markUsed(phone);
+  if(res.offline){ try{ const L = JSON.parse(localStorage.getItem('mood_leads')||'[]'); L.push({...lead, data:new Date().toISOString()}); localStorage.setItem('mood_leads', JSON.stringify(L)); }catch(e){} }
+
   const jitter = (Math.random()-.5) * SEG_DEG * .6;
   const targetMod = ((-(i+.5)*SEG_DEG + jitter) % 360 + 360) % 360;
   const curMod = ((rotation % 360) + 360) % 360;
   rotation += 360*6 + ((targetMod - curMod + 360) % 360);
-  spinning = true; $('spinBtn').disabled = true;
   $('wheelWrap').classList.remove('locked');
   $('wheelWrap').scrollIntoView({behavior:'smooth', block:'center'});
   $('wheel').style.transform = `rotate(${rotation}deg)`;
-  markUsed(phone);
-
-  // Lead: aqui entra o envio para Google Sheets/CRM (webhook) na versão publicada.
-  const code = 'MOOD-' + Math.random().toString(36).slice(2,6).toUpperCase();
-  const lead = {nome, whatsapp: phone, premio: PRIZES[i].full, codigo: code, data: new Date().toISOString()};
-  try{ const L = JSON.parse(localStorage.getItem('mood_leads')||'[]'); L.push(lead); localStorage.setItem('mood_leads', JSON.stringify(L)); }catch(e){}
 
   const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 6400;
   setTimeout(()=>showResult(nome, PRIZES[i], code), delay);
