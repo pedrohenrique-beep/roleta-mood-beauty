@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241A15">
+<meta name="description" content="Gire a roleta da Mood Beauty e ganhe um benefício no seu próximo horário.">
+<meta property="og:title" content="Roleta Mood Beauty">
+<meta property="og:description" content="Todo giro ganha. Concorra a uma Mood Experience completa.">
+<title>Roleta Mood Beauty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&display=swap">
+<style>
+/* Layout: coluna única centrada no celular (tráfego mobile), roleta como peça central; mármore escuro com veios dourados da identidade Mood. Tema único escuro por escolha de marca. */
+:root{
+  --espresso:#241A15;
+  --cacau:#3B2B22;
+  --taupe:#7A6B60;
+  --osso:#EFE7DD;
+  --ouro:#C9A46A;
+  --ouro-claro:#E4CB9C;
+  --muted:#B5A799;
+  --display:"Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --body:"Jost", "Futura", "Century Gothic", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  background:var(--espresso);
+  color:var(--osso);
+  font-family:var(--body);
+  font-weight:300;
+  font-size:16px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:0;
+  overflow-x:hidden;
+}
+.veios{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+.page{position:relative;z-index:1;max-width:460px;margin:0 auto;padding-block:28px 40px;display:flex;flex-direction:column;gap:28px}
+
+header{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.logo{font-family:var(--display);font-weight:400;font-size:44px;letter-spacing:.06em;line-height:1;color:var(--osso)}
+.logo small{display:block;font-family:var(--body);font-size:10px;letter-spacing:.55em;margin-top:6px;padding-left:.55em;color:var(--muted)}
+.eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ouro);margin-top:14px}
+
+.hero{text-align:center;display:flex;flex-direction:column;gap:12px}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,8vw,40px);line-height:1.12;margin:0;text-wrap:balance}
+.hero h1 em{color:var(--ouro-claro)}
+.hero p{margin:0;color:var(--muted);text-wrap:balance}
+.hero strong{color:var(--osso);font-weight:500}
+
+/* Roleta */
+.wheel-wrap{position:relative;width:min(100%,360px);aspect-ratio:1;margin:0 auto;max-width:100%}
+.wheel-ring{position:absolute;inset:0;border-radius:50%;padding:10px;background:conic-gradient(from 0deg,#8E6E3E,var(--ouro-claro),#9C7A45,var(--ouro),#7E5F33,var(--ouro-claro),#8E6E3E);box-shadow:0 20px 50px rgba(0,0,0,.55)}
+.wheel-ring::after{content:"";position:absolute;inset:10px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
+canvas#wheel{width:100%;height:100%;border-radius:50%;display:block;transition:transform 6.2s cubic-bezier(.12,.72,.08,1)}
+.pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:30px;height:42px;z-index:3;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+.hub{position:absolute;inset:50%;width:74px;height:74px;margin:-37px 0 0 -37px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#5A4536,var(--espresso));border:2px solid var(--ouro);display:grid;place-items:center;z-index:2;font-family:var(--display);font-size:22px;letter-spacing:.04em;color:var(--ouro-claro)}
+.wheel-wrap.locked canvas{filter:saturate(.6) brightness(.8)}
+
+/* Formulário */
+.card{background:rgba(59,43,34,.72);border:1px solid rgba(201,164,106,.35);border-radius:4px;padding:24px 20px;display:flex;flex-direction:column;gap:16px;backdrop-filter:blur(6px)}
+.card h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
+.card .sub{margin:-8px 0 0;color:var(--muted);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+input[type=text],input[type=tel]{font:inherit;font-weight:400;color:var(--osso);background:transparent;border:0;border-bottom:1px solid var(--taupe);padding:8px 0;font-size:17px;border-radius:0;outline:none}
+input[type=text]:focus,input[type=tel]:focus{border-bottom-color:var(--ouro)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0;line-height:1.45}
+.check input{accent-color:var(--ouro);margin-top:3px;width:16px;height:16px;flex:none}
+.err{color:#E8A08A;font-size:13px;min-height:1em;margin:0}
+.btn{font:inherit;font-weight:500;font-size:13px;letter-spacing:.24em;text-transform:uppercase;border:0;border-radius:2px;padding:17px 18px;cursor:pointer;background:linear-gradient(135deg,var(--ouro-claro),var(--ouro) 55%,#A9864F);color:var(--espresso);transition:transform .15s, filter .15s}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,input:focus-visible{outline:2px solid var(--ouro-claro);outline-offset:3px}
+.btn.ghost{background:transparent;color:var(--ouro-claro);border:1px solid var(--ouro)}
+.small{font-size:12px;color:var(--muted);text-align:center;margin:0}
+
+.perks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.perks li{display:flex;gap:12px;align-items:baseline;font-size:15px;border-bottom:1px solid rgba(122,107,96,.35);padding-bottom:10px}
+.perks li::before{content:"";width:6px;height:6px;transform:rotate(45deg) translateY(-2px);background:var(--ouro);flex:none}
+
+footer{text-align:center;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+
+/* Modal de resultado */
+.overlay{position:fixed;inset:0;background:rgba(20,14,11,.82);z-index:20;display:grid;place-items:center;padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px));backdrop-filter:blur(4px)}
+.result{width:100%;max-width:400px;background:var(--cacau);border:1px solid var(--ouro);border-radius:4px;padding:30px 22px;text-align:center;display:flex;flex-direction:column;gap:14px;animation:rise .5s ease}
+.result .tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ouro)}
+.result h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0}
+.result .prize{font-family:var(--display);font-style:italic;font-size:24px;color:var(--ouro-claro);line-height:1.25;text-wrap:balance}
+.result .cond{font-size:13px;color:var(--muted);margin:0}
+.code{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}
+.code code{font-family:var(--body);font-weight:500;font-size:20px;letter-spacing:.18em;border:1px dashed var(--ouro);padding:10px 16px;color:var(--osso);user-select:all}
+.copy{font:inherit;font-size:12px;letter-spacing:.15em;text-transform:uppercase;background:transparent;color:var(--ouro-claro);border:0;cursor:pointer;padding:8px}
+.result .actions{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+a.btn{text-decoration:none;display:block}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){canvas#wheel{transition-duration:.01s}.result{animation:none}}
+</style>
+</head>
+<body>
+
+<canvas class="veios" id="veios" aria-hidden="true"></canvas>
+
+<main class="page">
+  <header>
+    <div class="logo" aria-label="Mood Beauty">MOOD<small>BEAUTY</small></div>
+    <div class="eyebrow">Roleta da autoestima</div>
+  </header>
+
+  <section class="hero">
+    <h1>Seu próximo momento Mood pode ser <em>por nossa conta.</em></h1>
+    <p>Gire e concorra a uma <strong>Mood Experience completa</strong>: corte assinado + Hidravela. Todo giro garante um benefício no seu próximo horário.</p>
+  </section>
+
+  <div class="wheel-wrap locked" id="wheelWrap">
+    <svg class="pointer" viewBox="0 0 30 42" aria-hidden="true"><path d="M15 42 L2 10 A13 13 0 1 1 28 10 Z" fill="#C9A46A"/><circle cx="15" cy="12" r="5" fill="#241A15"/></svg>
+    <div class="wheel-ring"><canvas id="wheel" width="680" height="680" role="img" aria-label="Roleta com seis prêmios"></canvas></div>
+    <div class="hub">M</div>
+  </div>
+
+  <form class="card" id="form" novalidate>
+    <h2>Libere seu giro</h2>
+    <p class="sub">Leva 10 segundos. Um giro por WhatsApp.</p>
+    <div class="field">
+      <label for="nome">Nome</label>
+      <input type="text" id="nome" autocomplete="given-name" placeholder="Como podemos te chamar?">
+    </div>
+    <div class="field">
+      <label for="whats">WhatsApp</label>
+      <input type="tel" id="whats" inputmode="numeric" autocomplete="tel" placeholder="(31) 9 0000-0000">
+    </div>
+    <label class="check" for="aceite"><input type="checkbox" id="aceite"> <span>Aceito o regulamento e a política de privacidade e quero receber novidades da Mood Beauty pelo WhatsApp.</span></label>
+    <p class="err" id="err" role="alert"></p>
+    <button class="btn" type="submit" id="spinBtn">Girar a roleta</button>
+    <p class="small">Prêmio válido para agendamentos na unidade Savassi.</p>
+  </form>
+
+  <ul class="perks">
+    <li>Todo giro ganha um benefício</li>
+    <li>Resultado na hora, com código exclusivo</li>
+    <li>Use no seu próximo agendamento em até 15 dias</li>
+  </ul>
+
+  <footer>
+    <span>Mood Beauty · Savassi, Belo Horizonte</span>
+    <span>Terça a sábado, 8h às 20h</span>
+    <span>Benefícios não cumulativos. Consulte o regulamento da campanha.</span>
+  </footer>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="result" role="dialog" aria-modal="true" aria-labelledby="resTitle">
+    <span class="tag" id="resTag">Seu benefício</span>
+    <h3 id="resTitle">Parabéns, <span id="resNome"></span>!</h3>
+    <div class="prize" id="resPrize"></div>
+    <p class="cond" id="resCond"></p>
+    <div class="code"><code id="resCode">MOOD-0000</code><button class="copy" type="button" id="copyBtn">Copiar</button></div>
+    <p class="cond">Apresente o código ao agendar. Válido por 15 dias na Mood Beauty Savassi.</p>
+    <div class="actions">
+      <a class="btn" href="https://bit.ly/moodbeautybh" target="_blank" rel="noopener">Agendar meu horário</a>
+      <button class="btn ghost" type="button" id="resetBtn">Novo participante</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Prêmios e chances (peso em %). Ajuste aqui.
+const PRIZES = [
+  {label:"10% OFF",        sub:"em qualquer serviço",     full:"10% OFF em qualquer serviço",                         cond:"Válido para um serviço por atendimento.", w:34},
+  {label:"Hidratação",     sub:"de cortesia",             full:"Hidratação de cortesia",                              cond:"Na realização de qualquer serviço de cabelo.", w:24},
+  {label:"Sobrancelha",    sub:"design de cortesia",      full:"Design de sobrancelha de cortesia",                   cond:"Na realização de qualquer serviço.", w:16},
+  {label:"15% OFF",        sub:"em alongamento",          full:"15% OFF em alongamento de unhas",                     cond:"Válido para aplicação nova.", w:15},
+  {label:"R$ 100",         sub:"em serviços",             full:"Vale de R$ 100 em serviços",                          cond:"Em serviços a partir de R$ 300.", w:9},
+  {label:"Mood Experience",sub:"corte + Hidravela",       full:"Mood Experience: corte assinado + Hidravela",         cond:"Prêmio integral, sem compra mínima.", w:2, rare:true}
+];
+
+const cv = document.getElementById('wheel'), ctx = cv.getContext('2d');
+const N = PRIZES.length, SEG = 2*Math.PI/N, SEG_DEG = 360/N;
+const C = cv.width/2, R = C;
+
+function drawWheel(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  for(let i=0;i<N;i++){
+    const a0 = -Math.PI/2 + i*SEG, a1 = a0 + SEG;
+    const g = ctx.createRadialGradient(C,C,40,C,C,R);
+    if(PRIZES[i].rare){ g.addColorStop(0,'#2A1F19'); g.addColorStop(1,'#16100C'); }
+    else if(i%2===0){ g.addColorStop(0,'#4A382D'); g.addColorStop(1,'#33251D'); }
+    else { g.addColorStop(0,'#8A7A6E'); g.addColorStop(1,'#6E6056'); }
+    ctx.beginPath(); ctx.moveTo(C,C); ctx.arc(C,C,R,a0,a1); ctx.closePath();
+    ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = '#C9A46A'; ctx.lineWidth = 3; ctx.stroke();
+
+    // texto
+    ctx.save();
+    ctx.translate(C,C); ctx.rotate(a0 + SEG/2);
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    const rare = PRIZES[i].rare;
+    ctx.fillStyle = rare ? '#E4CB9C' : '#EFE7DD';
+    ctx.font = (rare? 'italic 400 34px ' : '400 38px ') + (rare? '"Bodoni Moda", Georgia, serif' : '"Bodoni Moda", Georgia, serif');
+    const main = rare ? 'Mood' : PRIZES[i].label;
+    ctx.fillText(main, R-34, rare ? -22 : -14);
+    ctx.font = '400 19px "Jost", system-ui, sans-serif';
+    ctx.fillStyle = rare ? '#C9A46A' : 'rgba(239,231,221,.78)';
+    const sub = rare ? 'Experience' : PRIZES[i].sub.toUpperCase();
+    if(rare){ ctx.font = 'italic 400 30px "Bodoni Moda", Georgia, serif'; ctx.fillStyle='#E4CB9C'; ctx.fillText('Experience', R-34, 14); ctx.font='500 15px "Jost", system-ui, sans-serif'; ctx.fillStyle='#C9A46A'; ctx.fillText('PRÊMIO RARO', R-34, 44); }
+    else ctx.fillText(sub, R-34, 22);
+    ctx.restore();
+  }
+  // borda interna dourada
+  ctx.beginPath(); ctx.arc(C,C,R-2,0,2*Math.PI); ctx.strokeStyle='#E4CB9C'; ctx.lineWidth=4; ctx.stroke();
+}
+document.fonts ? document.fonts.ready.then(drawWheel) : 0;
+drawWheel();
+
+// Veios de mármore no fundo
+(function(){
+  const v = document.getElementById('veios'), c = v.getContext('2d');
+  function paint(){
+    const dpr = Math.min(window.devicePixelRatio||1,2);
+    v.width = innerWidth*dpr; v.height = innerHeight*dpr; v.style.width=innerWidth+'px'; v.style.height=innerHeight+'px';
+    c.scale(dpr,dpr);
+    let seed = 7; const rnd = ()=>((seed = (seed*16807)%2147483647)/2147483647);
+    for(let k=0;k<9;k++){
+      c.beginPath();
+      let x = rnd()*innerWidth, y = -20;
+      c.moveTo(x,y);
+      while(y < innerHeight+20){ x += (rnd()-.5)*90; y += 30+rnd()*60; c.lineTo(x,y); }
+      c.strokeStyle = `rgba(201,164,106,${.10+rnd()*.18})`; c.lineWidth = .6+rnd()*1.1; c.stroke();
+    }
+  }
+  paint(); addEventListener('resize', ()=>{ const c2=v.getContext('2d'); c2.setTransform(1,0,0,1,0,0); paint(); });
+})();
+
+// Formulário
+const $ = id => document.getElementById(id);
+const whats = $('whats');
+whats.addEventListener('input', ()=>{
+  let d = whats.value.replace(/\D/g,'').slice(0,11);
+  let out = d;
+  if(d.length>2) out = `(${d.slice(0,2)}) ${d.slice(2)}`;
+  if(d.length>7) out = `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  whats.value = out;
+});
+
+function used(phone){ try{ return JSON.parse(localStorage.getItem('mood_giros')||'[]').includes(phone); }catch(e){ return false; } }
+function markUsed(phone){ try{ const a = JSON.parse(localStorage.getItem('mood_giros')||'[]'); a.push(phone); localStorage.setItem('mood_giros', JSON.stringify(a)); }catch(e){} }
+
+function pick(){
+  const total = PRIZES.reduce((s,p)=>s+p.w,0);
+  let r = Math.random()*total;
+  for(let i=0;i<N;i++){ r -= PRIZES[i].w; if(r<0) return i; }
+  return 0;
+}
+
+let rotation = 0, spinning = false;
+$('form').addEventListener('submit', e=>{
+  e.preventDefault();
+  if(spinning) return;
+  const nome = $('nome').value.trim(), phone = whats.value.replace(/\D/g,'');
+  const err = $('err');
+  if(nome.length < 2){ err.textContent = 'Digite seu nome para liberar o giro.'; $('nome').focus(); return; }
+  if(phone.length < 10){ err.textContent = 'Digite um WhatsApp válido com DDD.'; whats.focus(); return; }
+  if(!$('aceite').checked){ err.textContent = 'Marque o aceite do regulamento para girar.'; return; }
+  if(used(phone)){ err.textContent = 'Este WhatsApp já girou a roleta. Cada número tem direito a um giro.'; return; }
+  err.textContent = '';
+
+  const i = pick();
+  const jitter = (Math.random()-.5) * SEG_DEG * .6;
+  const targetMod = ((-(i+.5)*SEG_DEG + jitter) % 360 + 360) % 360;
+  const curMod = ((rotation % 360) + 360) % 360;
+  rotation += 360*6 + ((targetMod - curMod + 360) % 360);
+  spinning = true; $('spinBtn').disabled = true;
+  $('wheelWrap').classList.remove('locked');
+  $('wheelWrap').scrollIntoView({behavior:'smooth', block:'center'});
+  $('wheel').style.transform = `rotate(${rotation}deg)`;
+  markUsed(phone);
+
+  // Lead: aqui entra o envio para Google Sheets/CRM (webhook) na versão publicada.
+  const code = 'MOOD-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  const lead = {nome, whatsapp: phone, premio: PRIZES[i].full, codigo: code, data: new Date().toISOString()};
+  try{ const L = JSON.parse(localStorage.getItem('mood_leads')||'[]'); L.push(lead); localStorage.setItem('mood_leads', JSON.stringify(L)); }catch(e){}
+
+  const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 6400;
+  setTimeout(()=>showResult(nome, PRIZES[i], code), delay);
+});
+
+function showResult(nome, p, code){
+  $('resNome').textContent = nome.split(' ')[0];
+  $('resPrize').textContent = p.full;
+  $('resCond').textContent = p.cond;
+  $('resCode').textContent = code;
+  $('resTag').textContent = p.rare ? 'Prêmio raro' : 'Seu benefício';
+  $('overlay').hidden = false;
+  spinning = false;
+}
+
+$('copyBtn').addEventListener('click', ()=>{
+  const t = $('resCode').textContent;
+  const done = ()=>{ $('copyBtn').textContent = 'Copiado'; setTimeout(()=>$('copyBtn').textContent='Copiar',1800); };
+  try{
+    navigator.clipboard.writeText(t).then(done).catch(sel);
+  }catch(e){ sel(); }
+  function sel(){ const r = document.createRange(); r.selectNodeContents($('resCode')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+});
+
+$('resetBtn').addEventListener('click', ()=>{
+  $('overlay').hidden = true;
+  $('form').reset(); $('spinBtn').disabled = false;
+  $('wheelWrap').classList.add('locked');
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+</script>
+
+</body>
+</html>
