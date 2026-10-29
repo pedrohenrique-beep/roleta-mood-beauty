@@ -465,7 +465,7 @@ function showResult(nome, p, code){
   const validade = dataBR(validadeDe(new Date()));
   $('resVal').textContent = validade;
   if(WHATSAPP_LOJA){
-    const texto = `Olá, quero utilizar meu cupom de desconto da Black Friday!\n\nCupom: ${code}\nPrêmio: ${p.full}\nVálido até: ${validade}\nNome: ${nome}`;
+    const texto = `Olá, quero utilizar meu cupom de desconto da roleta premiada!\n\nCupom: ${code}\nPrêmio: ${p.full}\nVálido até: ${validade}\nNome: ${nome}`;
     $('agendarBtn').href = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(texto)}`;
   }
   $('resTag').textContent = 'Black Mood · Seu benefício';
