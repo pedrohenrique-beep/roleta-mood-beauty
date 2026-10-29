@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#7A6C61">
 <meta name="description" content="Gire a roleta da Mood Beauty e ganhe um benefício no seu próximo horário.">
 <meta property="og:title" content="Roleta Mood Beauty">
-<meta property="og:description" content="Todo giro ganha. Concorra a uma Mood Experience completa.">
+<meta property="og:description" content="Todo giro ganha. Até 30% OFF em serviços da Mood Beauty.">
 <title>Roleta Mood Beauty</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&display=swap">
@@ -127,8 +127,8 @@ a.btn{text-decoration:none;display:block}
   </header>
 
   <section class="hero">
-    <h1>Seu próximo momento Mood pode ser <em>por nossa conta.</em></h1>
-    <p>Gire e concorra a uma <strong>Mood Experience completa</strong>: corte assinado + Hidravela. Todo giro garante um benefício no seu próximo horário.</p>
+    <h1>Seu próximo momento Mood com <em>até 30% OFF.</em></h1>
+    <p>Gire e ganhe <strong>até 30% OFF</strong> em corte, mechas, progressiva, Hidravela ou hidratação com ozônio. Todo giro garante um desconto no seu próximo horário.</p>
   </section>
 
   <div class="wheel-wrap locked" id="wheelWrap" tabindex="0" aria-label="Girar a roleta">
@@ -186,12 +186,11 @@ a.btn{text-decoration:none;display:block}
 <script>
 // Prêmios e chances (peso em %). Ajuste aqui.
 const PRIZES = [
-  {label:"10% OFF",        sub:"em qualquer serviço",     full:"10% OFF em qualquer serviço",                         cond:"Válido para um serviço por atendimento.", w:34},
-  {label:"Hidratação",     sub:"de cortesia",             full:"Hidratação de cortesia",                              cond:"Na realização de qualquer serviço de cabelo.", w:24},
-  {label:"Sobrancelha",    sub:"design de cortesia",      full:"Design de sobrancelha de cortesia",                   cond:"Na realização de qualquer serviço.", w:16},
-  {label:"15% OFF",        sub:"em alongamento",          full:"15% OFF em alongamento de unhas",                     cond:"Válido para aplicação nova.", w:15},
-  {label:"R$ 100",         sub:"em serviços",             full:"Vale de R$ 100 em serviços",                          cond:"Em serviços a partir de R$ 300.", w:9},
-  {label:"Mood Experience",sub:"corte + Hidravela",       full:"Mood Experience: corte assinado + Hidravela",         cond:"Prêmio integral, sem compra mínima.", w:2, rare:true}
+  {label:"20% OFF", sub:"Combo Corte",         full:"20% OFF no Combo Corte",               cond:"Desconto válido para o Combo Corte.",               w:32},
+  {label:"20% OFF", sub:"Combo Mechas",        full:"20% OFF no Combo Mechas",              cond:"Desconto válido para o Combo Mechas.",              w:32},
+  {label:"30% OFF", sub:"Hidratação Ozônio",   full:"30% OFF na Hidratação com Ozônio",     cond:"Desconto válido para a Hidratação com Ozônio.",     w:12},
+  {label:"20% OFF", sub:"Progressiva",         full:"20% OFF na Progressiva",               cond:"Desconto válido para a Progressiva.",               w:12},
+  {label:"20% OFF", sub:"Hidravela",           full:"20% OFF na Hidravela",                 cond:"Desconto válido para a Hidravela.",                 w:12}
 ];
 
 const cv = document.getElementById('wheel'), ctx = cv.getContext('2d');
@@ -204,6 +203,7 @@ function drawWheel(){
     const a0 = -Math.PI/2 + i*SEG, a1 = a0 + SEG;
     const g = ctx.createRadialGradient(C,C,40,C,C,R);
     if(PRIZES[i].rare){ g.addColorStop(0,'#2A1F19'); g.addColorStop(1,'#16100C'); }
+    else if(i===N-1 && N%2===1){ g.addColorStop(0,'#55453A'); g.addColorStop(1,'#3B2F27'); }
     else if(i%2===0){ g.addColorStop(0,'#3F2F25'); g.addColorStop(1,'#2A1E17'); }
     else { g.addColorStop(0,'#6A5A4E'); g.addColorStop(1,'#4F4239'); }
     ctx.beginPath(); ctx.moveTo(C,C); ctx.arc(C,C,R,a0,a1); ctx.closePath();
@@ -223,7 +223,7 @@ function drawWheel(){
     ctx.fillStyle = rare ? '#C9A46A' : 'rgba(239,231,221,.78)';
     const sub = rare ? 'Experience' : PRIZES[i].sub.toUpperCase();
     if(rare){ ctx.font = 'italic 400 30px "Bodoni Moda", Georgia, serif'; ctx.fillStyle='#E4CB9C'; ctx.fillText('Experience', R-34, 14); ctx.font='500 15px "Jost", system-ui, sans-serif'; ctx.fillStyle='#C9A46A'; ctx.fillText('PRÊMIO RARO', R-34, 44); }
-    else ctx.fillText(sub, R-34, 22);
+    else { ctx.font = '500 18px "Jost", system-ui, sans-serif'; ctx.fillText(sub, R-34, 22); }
     ctx.restore();
   }
   // borda interna dourada
