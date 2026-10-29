@@ -65,7 +65,15 @@ header{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:
 .wheel-ring::after{content:"";position:absolute;inset:10px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
 canvas#wheel{width:100%;height:100%;border-radius:50%;display:block;transition:transform 6.2s cubic-bezier(.12,.72,.08,1)}
 .pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:30px;height:42px;z-index:3;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
-.hub{position:absolute;inset:50%;width:74px;height:74px;margin:-37px 0 0 -37px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#5A4536,var(--espresso));border:2px solid var(--ouro);display:grid;place-items:center;z-index:2;font-family:var(--display);font-size:22px;letter-spacing:.04em;color:var(--ouro-claro)}
+.hub{position:absolute;left:50%;top:50%;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;z-index:5;border:3px solid var(--espresso);background:radial-gradient(circle at 35% 28%,#F3DDAE,var(--ouro) 55%,#9C7A45);color:var(--espresso);font:500 14px/1 var(--body);letter-spacing:.2em;padding-left:.2em;cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 18px rgba(36,26,21,.55);animation:pulso 1.8s ease-out infinite;transition:transform .15s}
+.hub:hover{transform:scale(1.04)}
+.hub:active{transform:scale(.96)}
+.hub:focus-visible{outline:2px solid var(--osso);outline-offset:4px}
+.hub span{display:flex;flex-direction:column;align-items:center;gap:5px}
+.hub small{font-size:8px;letter-spacing:.18em;font-weight:500;opacity:.75}
+.wheel-wrap.spinning .hub{animation:none;cursor:default}
+@keyframes pulso{0%{box-shadow:0 6px 18px rgba(36,26,21,.55),0 0 0 0 rgba(228,203,156,.75)}70%{box-shadow:0 6px 18px rgba(36,26,21,.55),0 0 0 22px rgba(228,203,156,0)}100%{box-shadow:0 6px 18px rgba(36,26,21,.55),0 0 0 0 rgba(228,203,156,0)}}
+@media (prefers-reduced-motion:reduce){.hub{animation:none}}
 .wheel-wrap.locked canvas{filter:saturate(.6) brightness(.8)}
 .wheel-wrap{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wheel-msg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);width:min(84%,280px);z-index:4;background:var(--espresso);color:var(--osso);border:1px solid var(--ouro);border-radius:4px;padding:16px 18px;text-align:center;font-size:15px;line-height:1.45;box-shadow:0 14px 34px rgba(36,26,21,.5);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s}
@@ -134,7 +142,7 @@ a.btn{text-decoration:none;display:block}
   <div class="wheel-wrap locked" id="wheelWrap" tabindex="0" aria-label="Girar a roleta">
     <svg class="pointer" viewBox="0 0 30 42" aria-hidden="true"><path d="M15 42 L2 10 A13 13 0 1 1 28 10 Z" fill="#C9A46A"/><circle cx="15" cy="12" r="5" fill="#241A15"/></svg>
     <div class="wheel-ring"><canvas id="wheel" width="680" height="680" role="img" aria-label="Roleta com seis prêmios"></canvas></div>
-    <div class="hub">M</div>
+    <button class="hub" type="button" id="hubBtn" aria-label="Girar a roleta"><span>GIRAR<small>TOQUE AQUI</small></span></button>
     <div class="wheel-msg" id="wheelMsg" role="status" aria-live="polite"><strong>Quase lá</strong>Preencha seu nome e WhatsApp abaixo para liberar o seu giro.</div>
   </div>
 
@@ -302,7 +310,7 @@ $('form').addEventListener('submit', async e=>{
   if(used(phone)){ err.textContent = 'Este WhatsApp já girou a roleta. Cada número tem direito a um giro.'; return; }
   err.textContent = '';
 
-  spinning = true; btn.disabled = true; btn.textContent = 'Liberando seu giro…';
+  spinning = true; btn.disabled = true; btn.textContent = 'Liberando seu giro…'; $('wheelWrap').classList.add('spinning');
   const i = pick();
   const code = 'MOOD-' + Math.random().toString(36).slice(2,6).toUpperCase();
   const lead = {nome, whatsapp: '55' + phone, premio: PRIZES[i].full, codigo: code, origem: ORIGEM};
@@ -310,7 +318,7 @@ $('form').addEventListener('submit', async e=>{
   btn.textContent = 'Girar a roleta';
 
   if(!res.ok){
-    spinning = false; btn.disabled = false;
+    spinning = false; btn.disabled = false; $('wheelWrap').classList.remove('spinning');
     err.textContent = res.erro === 'ja_girou'
       ? 'Este WhatsApp já girou a roleta. Cada número tem direito a um giro.'
       : 'Não conseguimos liberar seu giro. Confira os dados e tente de novo.';
@@ -354,6 +362,22 @@ function clicarRoleta(){
   }, 1400);
 }
 $('wheelWrap').addEventListener('click', clicarRoleta);
+
+// Botão GIRAR no centro: com cadastro completo, gira; senão, leva direto ao cadastro.
+$('hubBtn').addEventListener('click', e=>{
+  e.stopPropagation();
+  if(spinning || !$('overlay').hidden) return;
+  const nomeOk = $('nome').value.trim().length >= 2;
+  const whatsOk = whats.value.replace(/\D/g,'').length >= 10;
+  if(nomeOk && whatsOk && $('aceite').checked){ $('form').requestSubmit(); return; }
+  const alvo = !nomeOk ? $('nome') : !whatsOk ? whats : $('aceite');
+  const card = $('form');
+  card.scrollIntoView({behavior:'smooth', block:'center'});
+  $('err').textContent = 'Preencha seus dados para liberar o seu giro.';
+  alvo.closest('.field')?.classList.add('attention');
+  card.classList.remove('nudge'); void card.offsetWidth; card.classList.add('nudge');
+  setTimeout(()=>alvo.focus({preventScroll:true}), 450);
+});
 $('wheelWrap').addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); clicarRoleta(); } });
 ['nome','whats'].forEach(id=>$(id).addEventListener('input', ()=>$(id).closest('.field').classList.remove('attention')));
 
@@ -364,7 +388,7 @@ function showResult(nome, p, code){
   $('resCode').textContent = code;
   $('resTag').textContent = p.rare ? 'Prêmio raro' : 'Seu benefício';
   $('overlay').hidden = false;
-  spinning = false;
+  spinning = false; $('wheelWrap').classList.remove('spinning');
 }
 
 $('copyBtn').addEventListener('click', ()=>{
