@@ -94,6 +94,13 @@ input[type=text]:focus,input[type=tel]:focus{border-bottom-color:var(--ouro)}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0;line-height:1.45}
 .check input{accent-color:var(--ouro);margin-top:3px;width:16px;height:16px;flex:none}
 .err{color:#E8A08A;font-size:13px;min-height:1em;margin:0}
+.hint{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.4;color:var(--muted);margin:2px 0 0}
+.hint::before{content:"";flex:none;width:6px;height:6px;margin-top:6px;transform:rotate(45deg);background:var(--ouro)}
+.hint strong{color:var(--ouro-claro);font-weight:500}
+.field.ok .hint{color:var(--ouro-claro)}
+.field.invalid input{border-bottom-color:#E8A08A}
+.field.invalid .hint{color:#E8A08A}
+.field.invalid .hint::before{background:#E8A08A}
 .btn{font:inherit;font-weight:500;font-size:13px;letter-spacing:.24em;text-transform:uppercase;border:0;border-radius:2px;padding:17px 18px;cursor:pointer;background:linear-gradient(135deg,var(--ouro-claro),var(--ouro) 55%,#A9864F);color:var(--espresso);transition:transform .15s, filter .15s}
 .btn:hover{filter:brightness(1.06)}
 .btn:active{transform:scale(.98)}
@@ -155,7 +162,8 @@ a.btn{text-decoration:none;display:block}
     </div>
     <div class="field">
       <label for="whats">WhatsApp</label>
-      <input type="tel" id="whats" inputmode="numeric" autocomplete="tel" placeholder="(31) 9 0000-0000">
+      <input type="tel" id="whats" inputmode="numeric" autocomplete="tel" placeholder="(31) 9 0000-0000" aria-describedby="whatsHint">
+      <p class="hint" id="whatsHint"><span>Use seu WhatsApp verdadeiro: <strong>o cupom fica vinculado a este número</strong> e só pode ser usado por ele no agendamento.</span></p>
     </div>
     <label class="check" for="aceite"><input type="checkbox" id="aceite"> <span>Aceito o regulamento e a política de privacidade e quero receber novidades da Mood Beauty pelo WhatsApp.</span></label>
     <p class="err" id="err" role="alert"></p>
@@ -270,6 +278,27 @@ whats.addEventListener('input', ()=>{
   whats.value = out;
 });
 
+// Celular brasileiro: DDD válido + 9 dígitos começando com 9, sem sequências óbvias.
+const DDDS = [11,12,13,14,15,16,17,18,19,21,22,24,27,28,31,32,33,34,35,37,38,41,42,43,44,45,46,47,48,49,51,53,54,55,61,62,63,64,65,66,67,68,69,71,73,74,75,77,79,81,82,83,84,85,86,87,88,89,91,92,93,94,95,96,97,98,99];
+function whatsValido(d){
+  if(d.length !== 11) return false;
+  if(!DDDS.includes(+d.slice(0,2))) return false;
+  if(d[2] !== '9') return false;
+  const n = d.slice(3);
+  if(/^(\d)\1{7}$/.test(n)) return false;
+  if('0123456789012345'.includes(n) || '9876543210987654'.includes(n)) return false;
+  return true;
+}
+whats.addEventListener('input', ()=>{
+  const f = whats.closest('.field'), d = whats.value.replace(/\D/g,'');
+  f.classList.remove('invalid');
+  f.classList.toggle('ok', whatsValido(d));
+});
+whats.addEventListener('blur', ()=>{
+  const f = whats.closest('.field'), d = whats.value.replace(/\D/g,'');
+  if(d.length && !whatsValido(d)) f.classList.add('invalid');
+});
+
 function used(phone){ try{ return JSON.parse(localStorage.getItem('mood_giros')||'[]').includes(phone); }catch(e){ return false; } }
 function markUsed(phone){ try{ const a = JSON.parse(localStorage.getItem('mood_giros')||'[]'); a.push(phone); localStorage.setItem('mood_giros', JSON.stringify(a)); }catch(e){} }
 
@@ -308,7 +337,7 @@ $('form').addEventListener('submit', async e=>{
   const nome = $('nome').value.trim(), phone = whats.value.replace(/\D/g,'');
   const err = $('err'), btn = $('spinBtn');
   if(nome.length < 2){ err.textContent = 'Digite seu nome para liberar o giro.'; $('nome').focus(); return; }
-  if(phone.length < 10){ err.textContent = 'Digite um WhatsApp válido com DDD.'; whats.focus(); return; }
+  if(!whatsValido(phone)){ err.textContent = 'Confira seu WhatsApp: precisa ter DDD + 9 dígitos, começando com 9.'; whats.closest('.field').classList.add('invalid'); whats.focus(); return; }
   if(!$('aceite').checked){ err.textContent = 'Marque o aceite do regulamento para girar.'; return; }
   if(used(phone)){ err.textContent = 'Este WhatsApp já girou a roleta. Cada número tem direito a um giro.'; return; }
   err.textContent = '';
@@ -348,7 +377,7 @@ let msgTimer;
 function clicarRoleta(){
   if(spinning || !$('overlay').hidden) return;
   const nomeOk = $('nome').value.trim().length >= 2;
-  const whatsOk = whats.value.replace(/\D/g,'').length >= 10;
+  const whatsOk = whatsValido(whats.value.replace(/\D/g,''));
   if(nomeOk && whatsOk && $('aceite').checked){ $('form').requestSubmit(); return; }
   const msg = $('wheelMsg');
   msg.classList.add('show');
@@ -371,7 +400,7 @@ $('hubBtn').addEventListener('click', e=>{
   e.stopPropagation();
   if(spinning || !$('overlay').hidden) return;
   const nomeOk = $('nome').value.trim().length >= 2;
-  const whatsOk = whats.value.replace(/\D/g,'').length >= 10;
+  const whatsOk = whatsValido(whats.value.replace(/\D/g,''));
   if(nomeOk && whatsOk && $('aceite').checked){ $('form').requestSubmit(); return; }
   const alvo = !nomeOk ? $('nome') : !whatsOk ? whats : $('aceite');
   const card = $('form');
