@@ -130,6 +130,8 @@ footer{text-align:center;font-size:12px;color:var(--sobre-fundo-suave);display:f
 .result .tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ouro)}
 .result h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0}
 .result .prize{font-family:var(--display);font-style:italic;font-size:24px;color:var(--ouro-claro);line-height:1.25;text-wrap:balance}
+.result .validade{margin:0;font-size:14px;letter-spacing:.04em;color:var(--osso)}
+.result .validade strong{color:var(--ouro-claro);font-weight:500}
 .result .cond{font-size:13px;color:var(--muted);margin:0}
 .code{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}
 .code code{font-family:var(--body);font-weight:500;font-size:20px;letter-spacing:.18em;border:1px dashed var(--ouro);padding:10px 16px;color:var(--osso);user-select:all}
@@ -184,13 +186,13 @@ a.btn{text-decoration:none;display:block}
   <ul class="perks">
     <li>Todo giro ganha um benefício</li>
     <li>Resultado na hora, com código exclusivo</li>
-    <li>Use em até 15 dias após o giro</li>
+    <li>Cupom válido até 30/11 (giros a partir de 16/11 valem por 15 dias)</li>
   </ul>
 
   <footer>
     <span>Mood Beauty · R. Santa Rita Durão, 1188 · Funcionários, Belo Horizonte</span>
     <span>Terça a sábado, 8h às 20h</span>
-    <span>Campanha Black Mood: giros até 30/11/2026, 23h59.</span>
+    <span>Campanha Black Mood: giros até 30/11/2026, 23h59. Cupons de giros feitos até 15/11 valem até 30/11; a partir de 16/11, valem por 15 dias após o giro.</span>
     <span>Benefício pessoal e intransferível, limitado a 1 por cliente e não cumulativo. Válido somente para agendamento feito pelo WhatsApp cadastrado.</span>
   </footer>
 </main>
@@ -202,7 +204,8 @@ a.btn{text-decoration:none;display:block}
     <div class="prize" id="resPrize"></div>
     <p class="cond" id="resCond"></p>
     <div class="code"><code id="resCode">MOOD-0000</code><button class="copy" type="button" id="copyBtn">Copiar</button></div>
-    <p class="cond">Agende pelo mesmo WhatsApp cadastrado e informe o código. Válido por 15 dias, 1 benefício por cliente.</p>
+    <p class="validade">Válido até <strong id="resVal">30/11</strong></p>
+    <p class="cond">Agende pelo mesmo WhatsApp cadastrado e informe o código. 1 benefício por cliente.</p>
     <div class="actions">
       <a class="btn" id="agendarBtn" href="https://wa.me/5531984829033?text=Ol%C3%A1%2C%20quero%20utilizar%20meu%20cupom%20de%20desconto!" target="_blank" rel="noopener">Agendar meu horário</a>
       <button class="btn ghost" type="button" id="resetBtn">Novo participante</button>
@@ -312,6 +315,15 @@ whats.addEventListener('blur', ()=>{
 
 // Campanha Black Mood: giros até 30/11/2026 23:59:59 (horário de Brasília)
 const FIM_CAMPANHA = new Date('2026-11-30T23:59:59-03:00');
+
+// Validade do cupom: até 30/11 ou 15 dias após o giro, o que for mais tarde.
+const VALIDADE_MINIMA = new Date('2026-11-30T23:59:59-03:00');
+const DIAS_VALIDADE = 15;
+function validadeDe(giro){
+  const mais15 = new Date(giro.getTime() + DIAS_VALIDADE*864e5);
+  return mais15 > VALIDADE_MINIMA ? mais15 : VALIDADE_MINIMA;
+}
+function dataBR(d){ return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'America/Sao_Paulo'}); }
 function campanhaAtiva(){ return Date.now() <= FIM_CAMPANHA.getTime(); }
 function atualizarTimer(){
   const ms = FIM_CAMPANHA - Date.now();
@@ -450,8 +462,10 @@ function showResult(nome, p, code){
   $('resPrize').textContent = p.full;
   $('resCond').textContent = p.cond;
   $('resCode').textContent = code;
+  const validade = dataBR(validadeDe(new Date()));
+  $('resVal').textContent = validade;
   if(WHATSAPP_LOJA){
-    const texto = `Olá, quero utilizar meu cupom de desconto da Black Friday!\n\nCupom: ${code}\nPrêmio: ${p.full}\nNome: ${nome}`;
+    const texto = `Olá, quero utilizar meu cupom de desconto da Black Friday!\n\nCupom: ${code}\nPrêmio: ${p.full}\nVálido até: ${validade}\nNome: ${nome}`;
     $('agendarBtn').href = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(texto)}`;
   }
   $('resTag').textContent = 'Black Mood · Seu benefício';
