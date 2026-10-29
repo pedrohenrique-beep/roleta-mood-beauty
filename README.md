@@ -16,11 +16,16 @@ Tudo está em `index.html`:
 
 - [ ] Colar a URL do App da Web em `SHEETS_URL` (index.html)
 
-- [ ] Pixel da Meta (PageView + Lead)
 
 ## Integração com a planilha
 
 O script está em `apps-script/Code.gs`. Ele grava cada giro na aba **Leads**, bloqueia WhatsApp repetido e cria a coluna **Status do resgate** para o time acompanhar.
+
+## Meta (Pixel + API de Conversões)
+
+- Pixel `341289984413754` no `index.html`: `PageView`, `Lead` (giro confirmado) e `Contact` (clique no WhatsApp).
+- O `Lead` também é enviado pelo servidor (Apps Script) com o mesmo `event_id` (código do cupom), sem duplicar.
+- **O token nunca vai para o código.** Ele fica em Apps Script → Configurações do projeto → Propriedades do script (`META_TOKEN`, `META_PIXEL_ID`, `META_TEST_CODE` opcional).
 
 ## Links por origem
 

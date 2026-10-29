@@ -8,6 +8,17 @@
 <meta property="og:title" content="Black Mood · Roleta Mood Beauty">
 <meta property="og:description" content="Black Friday Mood Beauty: gire e ganhe até 30% OFF. Só em novembro.">
 <title>Roleta Mood Beauty</title>
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '341289984413754');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=341289984413754&ev=PageView&noscript=1"></noscript>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&display=swap">
 <style>
@@ -354,6 +365,24 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyYdYQ4Uasf-swRYAuVN
 // WhatsApp da loja para o botão "Agendar meu horário" (só números, com DDI 55 e DDD). Ex.: '5531999999999'
 const WHATSAPP_LOJA = '5531984829033';
 
+// Meta: dados para a API de Conversões (enviados à planilha, que repassa à Meta pelo servidor)
+const PIXEL_ID = '341289984413754';
+function cookie(n){ const m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
+function dadosMeta(){
+  let fbc = cookie('_fbc');
+  const fbclid = new URLSearchParams(location.search).get('fbclid');
+  if(!fbc && fbclid) fbc = `fb.1.${Date.now()}.${fbclid}`;
+  return { fbp: cookie('_fbp'), fbc, url: location.href, ua: navigator.userAgent };
+}
+function rastrearLead(nome, whatsapp, premio, code){
+  if(!window.fbq) return;
+  try{
+    // Correspondência avançada: o pixel criptografa nome e telefone antes de enviar.
+    fbq('init', PIXEL_ID, { ph: whatsapp, fn: nome.split(' ')[0].toLowerCase(), country: 'br' });
+    fbq('track', 'Lead', { content_name: premio, origem: ORIGEM }, { eventID: code });
+  }catch(e){}
+}
+
 // Origem do lead: ?origem=trafego / ?origem=clientes (ou utm_source)
 const qs = new URLSearchParams(location.search);
 const ORIGEM = (qs.get('origem') || qs.get('utm_source') || 'direto').toLowerCase().slice(0,40);
@@ -385,7 +414,7 @@ $('form').addEventListener('submit', async e=>{
   spinning = true; btn.disabled = true; btn.textContent = 'Liberando seu giro…'; $('wheelWrap').classList.add('spinning');
   const i = pick();
   const code = 'BLACK-' + Math.random().toString(36).slice(2,6).toUpperCase();
-  const lead = {nome, whatsapp: '55' + phone, premio: PRIZES[i].full, codigo: code, origem: ORIGEM};
+  const lead = {nome, whatsapp: '55' + phone, premio: PRIZES[i].full, codigo: code, origem: ORIGEM, ...dadosMeta()};
   const res = await registrarLead(lead);
   btn.textContent = 'Girar a roleta';
 
@@ -398,6 +427,7 @@ $('form').addEventListener('submit', async e=>{
     return;
   }
   markUsed(phone);
+  rastrearLead(nome, '55' + phone, PRIZES[i].full, code);
   if(res.offline){ try{ const L = JSON.parse(localStorage.getItem('mood_leads')||'[]'); L.push({...lead, data:new Date().toISOString()}); localStorage.setItem('mood_leads', JSON.stringify(L)); }catch(e){} }
 
   const jitter = (Math.random()-.5) * SEG_DEG * .6;
@@ -468,6 +498,10 @@ function showResult(nome, p, code){
   $('overlay').hidden = false;
   spinning = false; $('wheelWrap').classList.remove('spinning');
 }
+
+$('agendarBtn').addEventListener('click', ()=>{
+  try{ if(window.fbq) fbq('track', 'Contact', { content_name: $('resPrize').textContent }, { eventID: $('resCode').textContent + '-contato' }); }catch(e){}
+});
 
 $('copyBtn').addEventListener('click', ()=>{
   const t = $('resCode').textContent;
