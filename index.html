@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#7A6C61">
+<meta name="theme-color" content="#0E0B09">
 <meta name="description" content="Gire a roleta da Mood Beauty e ganhe um benefício no seu próximo horário.">
-<meta property="og:title" content="Roleta Mood Beauty">
-<meta property="og:description" content="Todo giro ganha. Até 30% OFF em serviços da Mood Beauty.">
+<meta property="og:title" content="Black Mood · Roleta Mood Beauty">
+<meta property="og:description" content="Black Friday Mood Beauty: gire e ganhe até 30% OFF. Só em novembro.">
 <title>Roleta Mood Beauty</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&display=swap">
@@ -20,8 +20,8 @@
   --ouro:#C9A46A;
   --ouro-claro:#E4CB9C;
   --muted:#B5A799;
-  --fundo:#7A6C61;
-  --fundo-escuro:#5E5148;
+  --fundo:#100C0A;
+  --fundo-escuro:#070504;
   --sobre-fundo:#F6F0E9;
   --sobre-fundo-suave:#E6DCD0;
   --ouro-sobre-fundo:#F3DDAE;
@@ -33,7 +33,7 @@
 [hidden]{display:none!important}
 html,body{min-height:100%}
 body{
-  background:linear-gradient(180deg, #4E4038 0px, #5A4B41 260px, var(--fundo) 560px, #86776B 720px, var(--fundo) 1100px, var(--fundo-escuro) 100%), var(--fundo);
+  background:radial-gradient(90% 45% at 50% 52%, rgba(201,164,106,.16), transparent 70%), linear-gradient(180deg, var(--fundo-escuro) 0px, var(--fundo) 600px, #1A1410 1200px, var(--fundo-escuro) 100%), var(--fundo);
   color:var(--sobre-fundo);
   font-family:var(--body);
   font-weight:300;
@@ -55,6 +55,12 @@ header{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:
 .hero{text-align:center;display:flex;flex-direction:column;gap:12px}
 .hero h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,8vw,40px);line-height:1.12;margin:0;text-wrap:balance}
 .hero h1 em{color:var(--ouro-sobre-fundo)}
+.hero h1 .bf{display:block;font-size:clamp(46px,14vw,64px);line-height:1;letter-spacing:.01em;margin-bottom:10px;background:linear-gradient(180deg,#F6E3B8 10%,var(--ouro) 60%,#9C7A45);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.timer{align-self:center;display:inline-flex;align-items:center;gap:10px;margin-top:4px;padding:8px 16px;border:1px solid rgba(201,164,106,.55);border-radius:999px;font-size:13px;letter-spacing:.06em;color:var(--ouro-claro);font-variant-numeric:tabular-nums;background:rgba(14,11,9,.6)}
+.timer .dot{width:7px;height:7px;border-radius:50%;background:var(--ouro-claro);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.timer .dot{animation:none}}
+.encerrada .wheel-wrap,.encerrada #form{opacity:.45;pointer-events:none}
 .hero h1{text-shadow:0 2px 14px rgba(36,26,21,.45)}
 .hero p{margin:0;color:var(--sobre-fundo);font-weight:400;text-wrap:balance;text-shadow:0 1px 10px rgba(36,26,21,.5)}
 .hero strong{color:var(--sobre-fundo);font-weight:500}
@@ -138,17 +144,18 @@ a.btn{text-decoration:none;display:block}
 <main class="page">
   <header>
     <div class="logo" aria-label="Mood Beauty">MOOD<small>BEAUTY</small></div>
-    <div class="eyebrow">Roleta da autoestima</div>
+    <div class="eyebrow">Black Friday · Novembro</div>
   </header>
 
   <section class="hero">
-    <h1>Seu próximo momento Mood com <em>até 30% OFF.</em></h1>
-    <p>Gire e ganhe <strong>até 30% OFF</strong> em corte, mechas, progressiva, Hidravela ou hidratação com ozônio. Todo giro garante um desconto no seu próximo horário.</p>
+    <h1><span class="bf">Black Mood</span>Até <em>30% OFF</em> em todo giro.</h1>
+    <p>Durante novembro, gire a roleta e garanta desconto em <strong>corte, mechas, progressiva, Hidravela ou hidratação com ozônio</strong>. Todo giro ganha.</p>
+    <div class="timer" id="timer" role="timer"><span class="dot" aria-hidden="true"></span><span id="timerTxt">Giros liberados até 30/11</span></div>
   </section>
 
   <div class="wheel-wrap locked" id="wheelWrap" tabindex="0" aria-label="Girar a roleta">
     <svg class="pointer" viewBox="0 0 30 42" aria-hidden="true"><path d="M15 42 L2 10 A13 13 0 1 1 28 10 Z" fill="#C9A46A"/><circle cx="15" cy="12" r="5" fill="#241A15"/></svg>
-    <div class="wheel-ring"><canvas id="wheel" width="680" height="680" role="img" aria-label="Roleta com seis prêmios"></canvas></div>
+    <div class="wheel-ring"><canvas id="wheel" width="680" height="680" role="img" aria-label="Roleta com cinco prêmios"></canvas></div>
     <button class="hub" type="button" id="hubBtn" aria-label="Girar a roleta"><span>GIRAR<small>TOQUE AQUI</small></span></button>
     <div class="wheel-msg" id="wheelMsg" role="status" aria-live="polite"><strong>Quase lá</strong>Preencha seu nome e WhatsApp abaixo para liberar o seu giro.</div>
   </div>
@@ -174,12 +181,13 @@ a.btn{text-decoration:none;display:block}
   <ul class="perks">
     <li>Todo giro ganha um benefício</li>
     <li>Resultado na hora, com código exclusivo</li>
-    <li>Use no seu próximo agendamento em até 15 dias</li>
+    <li>Use em até 15 dias após o giro</li>
   </ul>
 
   <footer>
     <span>Mood Beauty · R. Santa Rita Durão, 1188 · Funcionários, Belo Horizonte</span>
     <span>Terça a sábado, 8h às 20h</span>
+    <span>Campanha Black Mood: giros até 30/11/2026, 23h59.</span>
     <span>Benefício pessoal e intransferível, limitado a 1 por cliente e não cumulativo. Válido somente para agendamento feito pelo WhatsApp cadastrado.</span>
   </footer>
 </main>
@@ -219,9 +227,9 @@ function drawWheel(){
     const a0 = -Math.PI/2 + i*SEG, a1 = a0 + SEG;
     const g = ctx.createRadialGradient(C,C,40,C,C,R);
     if(PRIZES[i].rare){ g.addColorStop(0,'#2A1F19'); g.addColorStop(1,'#16100C'); }
-    else if(i===N-1 && N%2===1){ g.addColorStop(0,'#55453A'); g.addColorStop(1,'#3B2F27'); }
-    else if(i%2===0){ g.addColorStop(0,'#3F2F25'); g.addColorStop(1,'#2A1E17'); }
-    else { g.addColorStop(0,'#6A5A4E'); g.addColorStop(1,'#4F4239'); }
+    else if(i===N-1 && N%2===1){ g.addColorStop(0,'#2E2520'); g.addColorStop(1,'#1A1411'); }
+    else if(i%2===0){ g.addColorStop(0,'#1C1613'); g.addColorStop(1,'#0B0807'); }
+    else { g.addColorStop(0,'#3A2E26'); g.addColorStop(1,'#231B16'); }
     ctx.beginPath(); ctx.moveTo(C,C); ctx.arc(C,C,R,a0,a1); ctx.closePath();
     ctx.fillStyle = g; ctx.fill();
     ctx.strokeStyle = '#C9A46A'; ctx.lineWidth = 3; ctx.stroke();
@@ -299,6 +307,26 @@ whats.addEventListener('blur', ()=>{
   if(d.length && !whatsValido(d)) f.classList.add('invalid');
 });
 
+// Campanha Black Mood: giros até 30/11/2026 23:59:59 (horário de Brasília)
+const FIM_CAMPANHA = new Date('2026-11-30T23:59:59-03:00');
+function campanhaAtiva(){ return Date.now() <= FIM_CAMPANHA.getTime(); }
+function atualizarTimer(){
+  const ms = FIM_CAMPANHA - Date.now();
+  if(ms <= 0){
+    $('timerTxt').textContent = 'A Black Mood terminou. Obrigada por participar!';
+    document.body.classList.add('encerrada');
+    $('spinBtn').disabled = true; $('hubBtn').disabled = true;
+    return false;
+  }
+  const d = Math.floor(ms/864e5), h = Math.floor(ms%864e5/36e5), m = Math.floor(ms%36e5/6e4);
+  const pad = n => String(n).padStart(2,'0');
+  $('timerTxt').textContent = d >= 1
+    ? `Giros até 30/11 · faltam ${d}d ${pad(h)}h ${pad(m)}min`
+    : `Últimas horas · faltam ${pad(h)}h ${pad(m)}min`;
+  return true;
+}
+if(atualizarTimer()) setInterval(atualizarTimer, 30000);
+
 function used(phone){ try{ return JSON.parse(localStorage.getItem('mood_giros')||'[]').includes(phone); }catch(e){ return false; } }
 function markUsed(phone){ try{ const a = JSON.parse(localStorage.getItem('mood_giros')||'[]'); a.push(phone); localStorage.setItem('mood_giros', JSON.stringify(a)); }catch(e){} }
 
@@ -334,6 +362,7 @@ let rotation = 0, spinning = false;
 $('form').addEventListener('submit', async e=>{
   e.preventDefault();
   if(spinning) return;
+  if(!campanhaAtiva()){ atualizarTimer(); return; }
   const nome = $('nome').value.trim(), phone = whats.value.replace(/\D/g,'');
   const err = $('err'), btn = $('spinBtn');
   if(nome.length < 2){ err.textContent = 'Digite seu nome para liberar o giro.'; $('nome').focus(); return; }
@@ -344,7 +373,7 @@ $('form').addEventListener('submit', async e=>{
 
   spinning = true; btn.disabled = true; btn.textContent = 'Liberando seu giro…'; $('wheelWrap').classList.add('spinning');
   const i = pick();
-  const code = 'MOOD-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  const code = 'BLACK-' + Math.random().toString(36).slice(2,6).toUpperCase();
   const lead = {nome, whatsapp: '55' + phone, premio: PRIZES[i].full, codigo: code, origem: ORIGEM};
   const res = await registrarLead(lead);
   btn.textContent = 'Girar a roleta';
@@ -419,10 +448,10 @@ function showResult(nome, p, code){
   $('resCond').textContent = p.cond;
   $('resCode').textContent = code;
   if(WHATSAPP_LOJA){
-    const texto = `Olá, quero utilizar meu cupom de desconto!\n\nCupom: ${code}\nPrêmio: ${p.full}\nNome: ${nome}`;
+    const texto = `Olá, quero utilizar meu cupom de desconto da Black Friday!\n\nCupom: ${code}\nPrêmio: ${p.full}\nNome: ${nome}`;
     $('agendarBtn').href = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(texto)}`;
   }
-  $('resTag').textContent = p.rare ? 'Prêmio raro' : 'Seu benefício';
+  $('resTag').textContent = 'Black Mood · Seu benefício';
   $('overlay').hidden = false;
   spinning = false; $('wheelWrap').classList.remove('spinning');
 }
