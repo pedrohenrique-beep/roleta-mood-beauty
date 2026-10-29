@@ -23,7 +23,7 @@ O script está em `apps-script/Code.gs`. Ele grava cada giro na aba **Leads**, b
 
 ## Meta (Pixel + API de Conversões)
 
-- Pixel `341289984413754` no `index.html`: `PageView`, `Lead` (giro confirmado) e `Contact` (clique no WhatsApp).
+- Pixel `2790669614663396` no `index.html`: `PageView`, `Lead` (giro confirmado) e `Contact` (clique no WhatsApp).
 - O `Lead` também é enviado pelo servidor (Apps Script) com o mesmo `event_id` (código do cupom), sem duplicar.
 - **O token nunca vai para o código.** Ele fica em Apps Script → Configurações do projeto → Propriedades do script (`META_TOKEN`, `META_PIXEL_ID`, `META_TEST_CODE` opcional).
 
