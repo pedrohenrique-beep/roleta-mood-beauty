@@ -185,7 +185,7 @@ a.btn{text-decoration:none;display:block}
     <div class="code"><code id="resCode">MOOD-0000</code><button class="copy" type="button" id="copyBtn">Copiar</button></div>
     <p class="cond">Agende pelo mesmo WhatsApp cadastrado e informe o código. Válido por 15 dias, 1 benefício por cliente.</p>
     <div class="actions">
-      <a class="btn" href="https://bit.ly/moodbeautybh" target="_blank" rel="noopener">Agendar meu horário</a>
+      <a class="btn" id="agendarBtn" href="https://bit.ly/moodbeautybh" target="_blank" rel="noopener">Agendar meu horário</a>
       <button class="btn ghost" type="button" id="resetBtn">Novo participante</button>
     </div>
   </div>
@@ -282,6 +282,9 @@ function pick(){
 
 // Integração com a planilha (Google Apps Script). Cole aqui a URL do App da Web.
 const SHEETS_URL = '';
+
+// WhatsApp da loja para o botão "Agendar meu horário" (só números, com DDI 55 e DDD). Ex.: '5531999999999'
+const WHATSAPP_LOJA = '';
 
 // Origem do lead: ?origem=trafego / ?origem=clientes (ou utm_source)
 const qs = new URLSearchParams(location.search);
@@ -386,6 +389,10 @@ function showResult(nome, p, code){
   $('resPrize').textContent = p.full;
   $('resCond').textContent = p.cond;
   $('resCode').textContent = code;
+  if(WHATSAPP_LOJA){
+    const texto = `Olá, quero utilizar meu cupom de desconto!\n\nCupom: ${code}\nPrêmio: ${p.full}\nNome: ${nome}`;
+    $('agendarBtn').href = `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(texto)}`;
+  }
   $('resTag').textContent = p.rare ? 'Prêmio raro' : 'Seu benefício';
   $('overlay').hidden = false;
   spinning = false; $('wheelWrap').classList.remove('spinning');
